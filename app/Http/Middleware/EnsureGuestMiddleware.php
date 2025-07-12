@@ -10,10 +10,10 @@ class EnsureGuestMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user()) {
+        if ($request->user('sanctum')) {
             return response()->json([
                 'message' => 'Already authenticated!',
-            ],403);
+            ], 409);
         }
         return $next($request);
     }
