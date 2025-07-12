@@ -146,11 +146,40 @@ class PollController extends Controller
         return response()->json($poll, 201);
     }
 
-    public function update()
+    public function update(Request $request, $pollId)
     {
+        $poll = Poll::find($pollId);
+
+        if (!$poll) {
+            return response()->json([
+                'message' => 'Poll not found!'
+            ], 404);
+        }
+
+        $request->validate([
+            'title' => 'sometimes|string',
+            'description' => 'nullable|string',
+            'choices' => 'sometimes|array|min:2',
+            'choices.*' => 'string',
+            'status' => 'in:active,inactive',
+            'expires_at' => 'date|after:now',
+        ]);
+
+        if ($request->has('choices')) {
+            // if options change, votes count would set to 0
+            $poll->choices = array_map(function ($choice) {
+                return ['choice_text' => $choice, 'votes_count' => 0];
+            }, $request->choices);
+        }
+
+        $poll->fill($request->only(['title', 'description', 'status', 'expires_at']));
+        $poll->save();
+
+        return response()->json($poll, 201);
     }
 
     public function destroy()
     {
     }
+
 }
