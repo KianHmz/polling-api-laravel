@@ -178,8 +178,21 @@ class PollController extends Controller
         return response()->json($poll, 201);
     }
 
-    public function destroy()
+    public function destroy($pollId)
     {
+        $poll = Poll::find($pollId);
+
+        if (!$poll) {
+            return response()->json([
+                'message' => 'Poll not found!'
+            ], 404);
+        }
+
+        $poll->delete();
+
+        return response()->json([
+            'message' => 'Poll destroyed successfully!'
+        ]);
     }
 
 }
