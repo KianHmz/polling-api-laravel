@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+// use MongoDB\Laravel\Eloquent\Model;
 use Illuminate\Database\Eloquent\Model;
 
 class Vote extends Model
 {
+    // protected $connection = 'mongodb';
+
     protected $fillable = [
         'poll_id',
         'user_id',
