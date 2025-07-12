@@ -120,8 +120,30 @@ class PollController extends Controller
         ]);
     }
 
-    public function store()
+    public function store(Request $request)
     {
+        $request->validate([
+            'title' => 'required|string|min:3',
+            'description' => 'nullable|string',
+            'choices' => 'required|array|min:2',
+            'choices.*' => 'string',
+            'status' => 'required|in:active,inactive',
+            'expires_at' => 'nullable|date|after:now',
+        ]);
+
+        $choices = array_map(function ($choice) {
+            return ['choice_text' => $choice, 'votes_count' => 0];
+        }, $request->choices);
+
+        $poll = Poll::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'choices' => $choices,
+            'status' => $request->status,
+            'expires_at' => $request->expires_at,
+        ]);
+
+        return response()->json($poll, 201);
     }
 
     public function update()
