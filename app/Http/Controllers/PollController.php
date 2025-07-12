@@ -97,6 +97,29 @@ class PollController extends Controller
         }
     }
 
+    public function results($pollId)
+    {
+        $poll = Poll::find($pollId);
+
+        if (!$poll) {
+            return response()->json([
+                'message' => 'Poll not found!'
+            ], 404);
+        }
+
+        $results = collect($poll->choices)->map(function ($choice) {
+            return [
+                'choice_text' => $choice['choice_text'],
+                'votes_count' => $choice['votes_count'],
+            ];
+        });
+
+        return response()->json([
+            'poll' => $poll->title,
+            'results' => $results,
+        ]);
+    }
+
     public function store()
     {
     }
