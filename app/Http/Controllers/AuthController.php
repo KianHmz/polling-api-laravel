@@ -21,7 +21,7 @@ class AuthController extends Controller
             $user = User::create([
                 'name' => $request->name,
                 'email' => $request->email,
-                'password' => $request->password,
+                'password' => Hash::make($request->password),
             ]);
 
             $token = $user->createToken('auth_token')->plainTextToken;
@@ -30,7 +30,7 @@ class AuthController extends Controller
                 'message' => 'Registered successfully!',
                 'access_token' => $token,
                 'token_type' => 'Bearer'
-            ]);
+            ], 201);
 
         } catch (ValidationException $e) {
             return response()->json([
@@ -68,7 +68,7 @@ class AuthController extends Controller
                 'message' => 'Logged-in successfully!',
                 'access_token' => $token,
                 'token_type' => 'Bearer'
-            ]);
+            ], 200);
 
         } catch (ValidationException $e) {
             return response()->json([
