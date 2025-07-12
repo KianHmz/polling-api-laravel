@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PollController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('ensure.guest')->group(function () {
