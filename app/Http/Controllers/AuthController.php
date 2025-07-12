@@ -34,13 +34,13 @@ class AuthController extends Controller
 
         } catch (ValidationException $e) {
             return response()->json([
-                'message' => 'Validation error',
+                'message' => 'Validation error!',
                 'errors' => $e->errors(),
             ], 422);
 
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => 'Server error',
+                'message' => 'Server error!',
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -72,13 +72,13 @@ class AuthController extends Controller
 
         } catch (ValidationException $e) {
             return response()->json([
-                'message' => 'Validation error',
+                'message' => 'Validation error!',
                 'errors' => $e->errors(),
             ], 422);
 
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => 'Server error',
+                'message' => 'Server error!',
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -95,7 +95,7 @@ class AuthController extends Controller
 
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => 'Server error',
+                'message' => 'Server error!',
                 'error' => $th->getMessage(),
             ], 500);
         }
@@ -108,7 +108,7 @@ class AuthController extends Controller
 
         } catch (\Throwable $th) {
             return response()->json([
-                'message' => 'Server error',
+                'message' => 'Server error!',
                 'error' => $th->getMessage(),
             ], 500);
         }
