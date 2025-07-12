@@ -4,28 +4,44 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use Laravel\Sanctum\HasApiTokens;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $credentials = $request->validate([
-            'name' => 'required|string|min:3|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|max:255|confirmed',
-        ]);
+        try {
 
-        $user = User::create($credentials);
+            $credentials = $request->validate([
+                'name' => 'required|string|min:3|max:255',
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|max:255|confirmed',
+            ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+            $user = User::create($credentials);
 
-        return response()->json([
-            'message' => 'Registered successfully!',
-            'access_token' => $token,
-            'token_type' => 'Bearer'
-        ]);
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Registered successfully!',
+                'access_token' => $token,
+                'token_type' => 'Bearer'
+            ]);
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => 'ERROR',
+                'error' => $th->getMessage(), // پیام خطا
+                'file' => $th->getFile(),     // فایلی که خطا در آن رخ داده
+                'line' => $th->getLine(),     // شماره خط
+                // 'trace' => $th->getTrace(), // اگر نیاز به جزئیات بیشتر داری
+            ], 500);
+        }
+
+
 
     }
 
