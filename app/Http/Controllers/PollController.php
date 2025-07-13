@@ -21,7 +21,6 @@ class PollController extends Controller
 
     public function vote(Request $request, $pollId)
     {
-        try {
             $user = Auth::user();
             $poll = Poll::find($pollId);
 
@@ -82,19 +81,6 @@ class PollController extends Controller
             return response()->json([
                 'message' => 'Vote submitted successfully!'
             ], 200);
-
-        } catch (ValidationException $e) {
-            return response()->json([
-                'message' => 'Validation error!',
-                'errors' => $e->errors(),
-            ], 422);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Server error!',
-                'error' => $e->getMessage()
-            ], 500);
-        }
     }
 
     public function results($pollId)
