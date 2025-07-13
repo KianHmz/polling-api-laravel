@@ -1,61 +1,197 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Polls API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is a RESTful API built with Laravel for user authentication and managing polls. Users can register, login, create polls (admin only), vote on polls, and see poll results.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Built With
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+![Laravel](https://img.shields.io/badge/Laravel-framework-red?logo=laravel&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-dbms-orange?logo=mysql&logoColor=white)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Features
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+-   User registration, login, logout with **Laravel Sanctum**
+-   Role-based access with **middleware**
+-   Admin: create, update, delete polls
+-   Users: view polls, vote once
+-   Validation + error handling (403, 404, 422, 500)
+-   Postman collection included
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Postman Collection
 
-## Laravel Sponsors
+You can import the Postman collection for easier testing and exploration:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Download the `public/etc/polls_api_postman_collection.json`.
+2. Import to Postamn.
+3. Set the `base_url`, `access_token`, and `pollId` variables.
+4. Use the pre-configured requests.
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## Installation & Running Locally (Laravel)
 
-## Contributing
+1. `git clone https://github.com/KianHmz/polling-api-laravel.git`
+2. `composer install`
+3. `cp .env.example .env`
+4. `php artisan migrate`
+5. `php artisan serve`
+6. Access API at `http://localhost:8000/api`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+## Base URL
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+https://your-api-domain.com/api
+```
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Authentication
 
-## License
+All endpoints (except register and login) require authentication via Bearer token (Laravel Sanctum).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## Endpoints
+
+### Public (No Auth Required)
+
+#### Register
+
+-   **POST** `/register`
+-   Request Body:
+    ```json
+    {
+        "name": "John Doe",
+        "email": "john@example.com",
+        "password": "password",
+        "password_confirmation": "password"
+    }
+    ```
+-   Response:
+    -   200 OK with access token on success
+    -   422 Validation errors
+
+#### Login
+
+-   **POST** `/login`
+-   Request Body:
+    ```json
+    {
+        "email": "john@example.com",
+        "password": "password"
+    }
+    ```
+-   Response:
+    -   200 OK with access token on success
+    -   422 Validation errors
+
+---
+
+### Authenticated User Endpoints
+
+Use the `Authorization: Bearer {access_token}` header for all requests.
+
+#### Logout
+
+-   **POST** `/logout`
+-   Response:
+    -   200 OK on success
+
+#### Get Current User
+
+-   **GET** `/user`
+-   Response: User object JSON
+
+#### List Active Polls
+
+-   **GET** `/polls`
+-   Response: Array of active polls that have not expired
+
+#### Vote on a Poll
+
+-   **POST** `/polls/{pollId}/vote`
+-   Request Body:
+    ```json
+    {
+        "choice": "Option Text"
+    }
+    ```
+-   Responses:
+    -   200 OK on success
+    -   403 if poll inactive or user already voted
+    -   404 if poll or option not found
+
+#### Get Poll Results
+
+-   **GET** `/polls/{pollId}/results`
+-   Response:
+    ```json
+    {
+      "poll": "Poll Title",
+      "results": [
+        {
+          "choice_text": "Option 1",
+          "votes_count": 5
+        },
+        ...
+      ]
+    }
+    ```
+
+---
+
+### Admin Endpoints (Require `role:admin`)
+
+#### Create Poll
+
+-   **POST** `/polls`
+-   Request Body:
+    ```json
+    {
+        "title": "Favorite Food?",
+        "description": "Choose your favorite food",
+        "choices": ["Pizza", "Burger", "Pasta"],
+        "status": "active",
+        "expires_at": "2025-12-31T00:00:00Z"
+    }
+    ```
+-   Response: Created poll JSON (201)
+
+#### Update Poll
+
+-   **PUT** `/polls/{pollId}`
+-   Request Body (any subset):
+    ```json
+    {
+        "title": "Updated Title",
+        "description": "Updated description",
+        "choices": ["Option 1", "Option 2"],
+        "status": "inactive",
+        "expires_at": "2025-11-30T00:00:00Z"
+    }
+    ```
+-   Response: Updated poll JSON (201)
+
+#### Delete Poll
+
+-   **DELETE** `/polls/{pollId}`
+-   Response:
+    -   200 OK on success
+
+---
+
+## Error Handling
+
+-   Validation errors return status `422` with details.
+-   Not found resources return `404`.
+-   Unauthorized actions return `403`.
+-   Server errors return `500`.
+
+---
